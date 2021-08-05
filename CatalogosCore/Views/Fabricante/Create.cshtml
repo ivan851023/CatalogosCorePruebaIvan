@@ -1,0 +1,108 @@
+﻿@model FabricantesModel
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create</h1>
+
+<div class="form-group">
+    @Html.LabelFor(x => x.labelCodigo)
+    @Html.TextBoxFor(x => x.CodigoFabricante, new { @class = "form-control", @id = "txtCodigo" })
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(x => x.labelDescripcion)
+    @Html.TextBoxFor(x => x.DescripcionFabricante, new { @class = "form-control", @id = "txtNombre" })
+</div>
+
+<div class="form-group">
+    <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
+</div>
+
+<div id="modalConfirmacion" class="modal" role="dialog" style="padding-top:110px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+
+
+            <div class="modal-body">
+                Esta seguro que desea crear este registro ?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" id="btnSi" data-dismiss="modal">Si</button>
+                <button class="btn btn-default" type="button" id="btnNo" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modalMsj" class="modal" role="dialog" style="padding-top:110px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+
+
+            <div class="modal-body">
+                <p id="textoDocumento"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" id="modalcerrar" data-dismiss="modal">cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+
+        $("#btnGuardar").click(function () {
+            showConfirmacion();
+        });
+
+        function showConfirmacion() {
+            $('#modalConfirmacion').modal({ backdrop: 'static', keyboard: false })
+            $("#modalConfirmacion").modal("show");
+        }
+
+         $("#btnSi").click(function () {
+            Guardar();
+        });
+
+        function showModal(msj) {
+            $('#modalMsj').modal({ backdrop: 'static', keyboard: false })
+            $('#textoDocumento').text(msj);
+            $("#modalMsj").modal("show");
+        }
+
+  
+        function Guardar() {
+
+            var info = { CodigoFabricante: $("#txtCodigo").val(), DescripcionFabricante: $("#txtNombre").val()};
+
+            (async () => {
+                const rawResponse = await fetch('@Url.Action("GuardarFabricante", "Fabricante")', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(info)
+                });
+                const content = await rawResponse.json();
+
+                showModal(content.responseText);
+            })();
+
+        };
+
+
+        $("#modalcerrar").click(function (event) {
+            window.location.href = '/Home/Index';
+        });
+
+</script>

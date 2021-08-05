@@ -1,0 +1,122 @@
+﻿@model ArticulosModel
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+@Html.HiddenFor(model => model.id, new { @id = "hfId" })
+
+
+
+
+<div class="form-group">
+
+    <label>Seleccione un Fabricante</label>
+    @Html.DropDownListFor(x => x.selectValueFabricante, Model.listFabricantes, "Seleccione una opción", new { @class = "form-control", @required = "true", @id = "ddlFabricante" })
+
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(x => x.labelCodigo)
+    @Html.TextBoxFor(x => x.CodigoArticulo, new { @class = "form-control", @id = "txtCodigo" })
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(x => x.labelDescripcion)
+    @Html.TextBoxFor(x => x.DescripcionArticulo, new { @class = "form-control", @id = "txtNombre" })
+</div>
+
+<div class="form-group">
+    <button type="button" id="btnEditar" class="btn btn-primary">Editar</button>
+</div>
+
+<div id="modalConfirmacion" class="modal" role="dialog" style="padding-top:110px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+
+
+            <div class="modal-body">
+                Esta seguro que desea modificar este registro ?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" id="btnSi" data-dismiss="modal">Si</button>
+                <button class="btn btn-default" type="button" id="btnNo" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modalMsj" class="modal" role="dialog" style="padding-top:110px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+
+
+            <div class="modal-body">
+                <p id="textoDocumento"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" id="modalcerrar" data-dismiss="modal">cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+
+
+        $("#btnEditar").click(function () {
+            showConfirmacion();
+        });
+
+        function showConfirmacion() {
+            $('#modalConfirmacion').modal({ backdrop: 'static', keyboard: false })
+            $("#modalConfirmacion").modal("show");
+        }
+
+         $("#btnSi").click(function () {
+            Editar();
+        });
+
+        function showModal(msj) {
+            $('#modalMsj').modal({ backdrop: 'static', keyboard: false })
+            $('#textoDocumento').text(msj);
+            $("#modalMsj").modal("show");
+        }
+
+
+
+        function Editar() {
+
+            var info = { id: $("#hfId").val(), CodigoArticulo: $("#txtCodigo").val(), DescripcionArticulo: $("#txtNombre").val(), selectValueFabricante : $("#ddlFabricante").val()};
+
+            (async () => {
+                const rawResponse = await fetch('@Url.Action("EditarArticulo", "Articulo")', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(info)
+                });
+                const content = await rawResponse.json();
+
+                showModal(content.responseText);
+            })();
+
+        };
+
+
+        $("#modalcerrar").click(function (event) {
+            window.location.href = '/Home/Index';
+        });
+
+</script>
+

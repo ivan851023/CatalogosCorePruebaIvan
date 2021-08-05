@@ -1,0 +1,162 @@
+﻿@model ArticulosModel
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create</h1>
+
+
+<div class="form-group">
+
+    <label>Seleccione un Fabricante</label>
+    @Html.DropDownListFor(x => x.selectValueFabricante, Model.listFabricantes, "Seleccione una opción", new { @class = "form-control", @required = "true", @id = "ddlFabricante" })
+
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(x => x.labelCodigo)
+    @Html.TextBoxFor(x => x.CodigoArticulo, new { @class = "form-control", @id = "txtCodigo" })
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(x => x.labelDescripcion)
+    @Html.TextBoxFor(x => x.DescripcionArticulo, new { @class = "form-control", @id = "txtNombre" })
+</div>
+
+
+<div class="form-group">
+    <div class="demo-section k-content">
+        <input name="files" id="files" type="file" aria-label="files" />
+
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#files").kendoUpload();
+        });
+    </script>
+
+</div>
+
+@*<div class="form-group">
+    <input type="file" name="files" id="imageFiles" multiple />
+</div>*@
+
+<div class="form-group">
+    <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
+</div>
+
+
+
+<div id="modalConfirmacion" class="modal" role="dialog" style="padding-top:110px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+
+
+            <div class="modal-body">
+                Esta seguro que desea crear este registro ?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" id="btnSi" data-dismiss="modal">Si</button>
+                <button class="btn btn-default" type="button" id="btnNo" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modalMsj" class="modal" role="dialog" style="padding-top:110px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+
+
+            <div class="modal-body">
+                <p id="textoDocumento"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" id="modalcerrar" data-dismiss="modal">cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+ 
+
+    $("#btnGuardar").click(function () {
+            showConfirmacion();
+        });
+
+        function showConfirmacion() {
+            $('#modalConfirmacion').modal({ backdrop: 'static', keyboard: false })
+            $("#modalConfirmacion").modal("show");
+        }
+
+         $("#btnSi").click(function () {
+            Guardar();
+        });
+
+        function showModal(msj) {
+            $('#modalMsj').modal({ backdrop: 'static', keyboard: false })
+            $('#textoDocumento').text(msj);
+            $("#modalMsj").modal("show");
+        }
+
+    
+
+    function Guardar() {
+
+        var fileData = new FormData();
+
+        var upload = $("#files").getKendoUpload();
+        var fileskendo = upload.getFiles();
+
+        for (var i = 0; i < fileskendo.length; i++) {
+            fileData.append('files', fileskendo[i].rawFile);
+        }
+
+   
+
+        var CodigoArticulo = $("#txtCodigo").val();
+        var DescripcionArticulo = $("#txtNombre").val();
+        var selectValueFabricante = $("#ddlFabricante").val();
+
+
+        fileData.append('CodigoArticulo', CodigoArticulo);
+        fileData.append('DescripcionArticulo', DescripcionArticulo);
+        fileData.append('selectValueFabricante', selectValueFabricante);
+
+        $.ajax({
+            url: '@Url.Action("GuardarArticulo","Articulo")',
+            method: 'POST',
+            dataType: 'json',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: fileData,
+            success: function(response)
+            {
+                if (response.success) {
+                    showModal(response.responseText);
+                }
+                else {
+                    showModal(response.responseText);
+                }
+            }
+           
+        });
+
+    };
+
+      
+
+        $("#modalcerrar").click(function (event) {
+            window.location.href = '/Home/Index';
+        });
+
+</script>

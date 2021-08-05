@@ -1,0 +1,149 @@
+﻿@model IEnumerable<CatalogosCore.Entities.Fabricantes>
+@{
+    ViewData["Title"] = "Fabricantes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    CatalogosCore.Models.SortingPagingInfo info = ViewBag.SortingPagingInfo;
+}
+
+<h1>Fabricantes</h1>
+
+
+@using (Html.BeginForm("Fabricantes", "Home", FormMethod.Post))
+{
+
+
+    <p class="text-right">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Fabricante" asp-action="Create">Nuevo Registro</a>
+    </p>
+
+   
+
+    @Html.Hidden("SortField", info.SortField)
+    @Html.Hidden("SortDirection", info.SortDirection)
+    @Html.Hidden("PageCount", info.PageCount)
+    @Html.Hidden("PageSize", info.PageSize)
+    @Html.Hidden("CurrentPageIndex", info.CurrentPageIndex)
+
+    <table border="1" cellpadding="10" class="table tab-content">
+        <tr>
+            <th><a href="#" data-sortfield="FabricanteId" class="header">Id</a></th>
+            <th><a href="#" data-sortfield="Codigo" class="header">Codigo Fabricante</a></th>
+            <th><a href="#" data-sortfield="Descripcion" class="header">Nombre Fabricante</a></th>
+
+        </tr>
+
+
+        @if (Model != null && Model.Count() > 0)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FabricanteId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Codigo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Descripcion)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Editar", "Edit", "Fabricante", new { idFabricante = item.FabricanteId }) |
+                        @Html.ActionLink("Eliminar", "Delete", "Fabricante",new { idFabricante = item.FabricanteId, @id = "btnEliminar" })
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td colspan="4">
+                    @for (var i = 0; i < info.PageCount; i++)
+                    {
+                        if (i == info.CurrentPageIndex)
+                        {
+                            <span>@(i + 1)</span>
+                        }
+                        else
+                        {
+                            <a href="#" data-pageindex="@i" class="pager">@(i + 1)</a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+        else
+        {
+            <td colspan="4" class="text-center"><b>No Data Available . Please Add Data By CLick On Create Button</b></td>
+        }
+
+
+    </table>
+}
+
+<div id="modalConfirmacion" class="modal confirmar" role="dialog" style="padding-top:110px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+
+
+            <div class="modal-body">
+                Esta seguro que desea eliminar este registro ?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" id="btnSi" data-dismiss="modal">Si</button>
+                <button class="btn btn-default" type="button" id="btnNo" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modalMsj" class="modal" role="dialog" style="padding-top:110px">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+
+
+            <div class="modal-body">
+                <p id="textoDocumento"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" type="button" id="modalcerrar" data-dismiss="modal">cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    
+    $(document).ready(function () {
+
+
+        $(".header").click(function (evt) {
+            var sortfield = $(evt.target).data("sortfield");
+            if ($("#SortField").val() == sortfield) {
+                if ($("#SortDirection").val() == "ascending") {
+                    $("#SortDirection").val("descending");
+                }
+                else {
+                    $("#SortDirection").val("ascending");
+                }
+            }
+            else {
+                $("#SortField").val(sortfield);
+                $("#SortDirection").val("ascending");
+            }
+            evt.preventDefault();
+            $("form").submit();
+        });
+
+        $(".pager").click(function (evt) {
+            var pageindex = $(evt.target).data("pageindex");
+            $("#CurrentPageIndex").val(pageindex);
+            evt.preventDefault();
+            $("form").submit();
+        });
+    });
+</script>
+
+
+
